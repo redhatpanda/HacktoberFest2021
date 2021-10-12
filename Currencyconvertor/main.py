@@ -1,83 +1,91 @@
 from tkinter import *
 from tkinter import ttk
 import requests
-import Currency as c
-from  tkinter import  messagebox
+from tkinter import *
+import tkinter as tk
+from tkinter import ttk
 
 
+class RealTimeCurrencyConverter():
+    def __init__(self,url):
+            self.data = requests.get(url).json()
+            self.currencies = self.data['rates']
 
-window = Tk()
-window.title("Convertor of Currency")
-ob1 = c.CurrencyConverter
-# def givevaluea():
-#
-#     ob1.methoda(firstvalue=drop_b.get())
-#
-#
-# def givevalueb():
-#     ob1.methodb(secondvalue=drop_a.get())
+    def convert(self, from_currency, to_currency, amount): 
+        initial_amount = amount 
+        if from_currency != 'USD' : 
+            amount = amount / self.currencies[from_currency] 
+  
+        # limiting the precision to 4 decimal places 
+        amount = round(amount * self.currencies[to_currency], 4) 
+        return amount
 
-# variable.trace_variable("w",options_changed )
+class App(tk.Tk):
 
+    def __init__(self, converter):
+        tk.Tk.__init__(self)
+        self.title = 'Currency Converter'
+        self.currency_converter = converter
 
+        #self.configure(background = 'blue')
+        self.geometry("600x250")
+        
+        # Label
+        self.intro_label = Label(self, text = 'Welcome to Real Time Currency Convertor',  fg = 'white',bg='navyblue', relief = tk.RAISED, borderwidth = 3)
+        self.intro_label.config(font = ('Courier',15,'bold'))
 
-def passer():
+        self.date_label = Label(self, text = f"1 Indian Rupee equals = {self.currency_converter.convert('INR','USD',1)} USD \n Date : {self.currency_converter.data['date']}", relief = tk.GROOVE, borderwidth = 5)
 
-    drop_b_box.delete(0,'end')
-    try:
-        i = int(drop_a_box.get())
-    except ValueError:
-        messagebox.showerror(title="ERROR", message="Please use int as input function")
+        self.intro_label.place(x = 120 , y = 0)
+        self.date_label.place(x = 160, y= 50)
 
-    finally:
-        value = ob1(from_currency= drop_a.get(),to_currency=drop_b.get(),from_currency_value=drop_a_box.get())
-        sub_main_title.config(text = value.title())
-        drop_b_box.insert(0,value.converter())
+        # Entry box
+        valid = (self.register(self.restrictNumberOnly), '%d', '%P')
+        self.amount_field = Entry(self,bd = 3, relief = tk.RIDGE, justify = tk.CENTER,validate='key', validatecommand=valid)
+        
+        self.converted_amount_field_label = Label(self, text = '', fg = 'black', bg = 'white', relief = tk.RIDGE, justify = tk.CENTER, width = 20, borderwidth = 3)
 
-main_title = Label(text = " REAL TIME CURRENCY CONVERTOR ", bg = "black", fg = "White", font =("Arial", 18, "bold"))
-main_title.grid(column = 0 , row = 0, columnspan = 2)
+        # dropdown
+        self.from_currency_variable = StringVar(self)
+        self.from_currency_variable.set("INR") # default value
+        self.to_currency_variable = StringVar(self)
+        self.to_currency_variable.set("USD") # default value
 
+        font = ("Courier", 12, "bold")
+        self.option_add('*TCombobox*Listbox.font', font)
+        self.from_currency_dropdown = ttk.Combobox(self, textvariable=self.from_currency_variable,values=list(self.currency_converter.currencies.keys()), font = font, state = 'readonly', width = 12, justify = tk.CENTER)
+        self.to_currency_dropdown = ttk.Combobox(self, textvariable=self.to_currency_variable,values=list(self.currency_converter.currencies.keys()), font = font, state = 'readonly', width = 12, justify = tk.CENTER)
 
-sub_main_title = Label(text = "",fg= "black",font =("Arial", 18, "bold"))
-sub_main_title.grid(column = 0, row = 1, columnspan =2 )
+        # placing
+        self.from_currency_dropdown.place(x = 40, y= 120)
+        self.amount_field.place(x = 36, y = 150)
+        self.to_currency_dropdown.place(x = 346, y= 120)
+        #self.converted_amount_field.place(x = 346, y = 150)
+        self.converted_amount_field_label.place(x = 346, y = 150)
+        
+        # Convert button
+        self.convert_button = Button(self, text = "Convert", fg = "black",bg="blue", command = self.perform) 
+        self.convert_button.config(font=('Courier', 15, 'bold'))
+        self.convert_button.place(x = 240, y = 190)
 
-k = StringVar()
-drop_a = ttk.Combobox(window,width = 27, textvariable = k)
-drop_a['values'] = ("CAD",
-                          "HKD",
-                          "ISK",
-                          "JPY",
-                          "INR",
-                          "USD" )
+    def perform(self):
+        amount = float(self.amount_field.get())
+        from_curr = self.from_currency_variable.get()
+        to_curr = self.to_currency_variable.get()
 
+        converted_amount = self.currency_converter.convert(from_curr,to_curr,amount)
+        converted_amount = round(converted_amount, 2)
 
-drop_a.grid(column = 0, row = 2, padx = 30, pady = 50)
+        self.converted_amount_field_label.config(text = str(converted_amount))
+    
+    def restrictNumberOnly(self, action, string):
+        regex = re.compile(r"[0-9,]*?(\.)?[0-9,]*$")
+        result = regex.match(string)
+        return (string == "" or (string.count('.') <= 1 and result is not None))
 
-drop_a_box = Entry(width = 40)
-drop_a_box.grid(column = 0 , row = 3,padx = 30, pady = 50)
+if __name__ == '__main__':
+    url = '  add your api url from here https://www.exchangerate-api.com/'
+    converter = RealTimeCurrencyConverter(url)
 
-drop_b = ttk.Combobox(window, width=27)
-# drop_b.bind(givevaluea())
-
-drop_b['values'] = ("CAD",
-                          "HKD",
-                          "ISK",
-                          "JPY",
-                          "INR",
-                          "USD" )
-
-
-drop_b.grid(column=1, row=2,padx = 30, pady = 50)
-
-
-
-drop_b_box = Entry(width = 40,validate = 'key')
-drop_b_box.grid(column = 1 , row = 3,padx = 30, pady = 50)
-
-
-convertor_button = Button(text = "CONVERT",width = 40, bg = "blue", command =passer)
-convertor_button.grid(column = 0, row = 4, columnspan = 2, padx = 10, pady = 20)
-
-
-
-window.mainloop()
+    App(converter)
+    mainloop()
