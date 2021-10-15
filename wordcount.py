@@ -3,7 +3,7 @@ S = input("Enter Your Sentence Here: ")
 
 
 D = {}
-#SS = S.split()
+# SS = S.split()
 for item in S:
     if item in D:
         D[item] = D[item] + 1

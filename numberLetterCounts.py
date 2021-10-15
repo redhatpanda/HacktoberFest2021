@@ -1,4 +1,4 @@
-from num2words import num2words 
+from num2words import num2words
 
 # Project Euler Problem 17
 
