@@ -1,3 +1,4 @@
+// to start "node create-mern-app.js" in your shell
 console.log("Loading...");
 console.log("Setting up Backend, Please Wait :)");
 const { exec } = require("child_process");
