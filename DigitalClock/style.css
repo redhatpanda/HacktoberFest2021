@@ -1,0 +1,34 @@
+body{
+    background:url(https://png.pngtree.com/thumb_back/fh260/background/20200605/pngtree-abstract-hacker-background-with-digital-number-image_338330.jpg);
+    background-size: cover;
+    overflow: hidden;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+}
+.container{
+
+    width:95%;
+    height:100vh;
+    margin:auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.digitalClock{
+    border:2px solid black;
+    width:fit-content;
+    margin: auto;
+    padding:10px;
+    border-radius: 2px;
+    color:black;
+    background-color:white;
+
+
+}
+.digitalClock h1{
+    display: inline-block;
+    margin:0 10px;
+    font-weight:bold;
+    font-size:5rem;
+
+}
